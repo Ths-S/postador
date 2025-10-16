@@ -1,0 +1,34 @@
+name: Auto Upload + Optimization
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"  # a cada 12h
+  workflow_dispatch:
+
+jobs:
+  upload_and_optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib requests openai
+
+      - name: Upload YouTube Video
+        run: python3 upload_youtube.py
+
+      - name: Upload Instagram Reel
+        run: python3 upload_instagram.py
+
+      - name: Collect Metrics
+        run: python3 collect_metrics.py
+
+      - name: Analyze and Optimize
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python3 analyze_metrics.py
